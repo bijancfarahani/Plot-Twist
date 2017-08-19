@@ -14,20 +14,45 @@ app.get('*', function(req,res) {
     res.sendFile(path.join(__dirname + '/../public/index.html'));
 });
 
-var clients = {};
-var roomSize = {room1: 0, room2: 0, room3: 0, room4: 0};
+var clients = [];
+var sioRoom = io.sockets.adapter.rooms[roomToJoin.room];
+if(sioRoom) {
+    Object.keys(sioRoom.sockets).forEach( function(socketId){
+        console.log("sioRoom client socket Id: " + socketId );
+    });
+    console.log(Object.keys(sioRoom.length));
+}
+var roomSize = {
+    room1: 0,
+    room2: 0,
+    room3: 0,
+    room4: 0};
 
 io.on('connection', function(socket){
   console.log(socket.id + ' connected');
   clients.push(socket.id);
+  socket.on('test', function(data) {
+    console.log(data.message + ' received');
+  });
   socket.on('clientInfo', function(clientInfo) {
-      console.log('clientInfo: ' + clientInfo.name + clientInfo.age);
-  })
+      clients[socket.id] = clientInfo;
+      console.log('clientInfo: ' + clients[socket.id].name);
+      socket.emit('roomInfo',roomSize);
 
-  console.log(io.sockets.adapter.rooms)
-  socket.broadcast.emit('newRoom', socket.id);
+  });
+
+  socket.on('joinRoom', function(roomToJoin) {
+    if(roomSize[roomToJoin.room] < 4) {
+      socket.join(roomToJoin.room);
+      roomSize[roomToJoin.room] += 1;
+    }
+    console.log(roomSize);
+  });
+
   socket.on('disconnect', function(){
-    console.log('user disconnected');
+    delete clients[socket.id];  //remove client from currently connected clients list
+    console.log(socket.id + ' disconnected');
+
   });
 });
     

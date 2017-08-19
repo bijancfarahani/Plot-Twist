@@ -2,11 +2,13 @@ var app = angular.module('appRoutes',['ngRoute'])
     .config(function($routeProvider, $locationProvider) {
         $routeProvider
             .when('/', {
-                templateUrl: 'clientInput.html'
+                templateUrl: 'partials/clientInput.html',
+                controller: 'mainController'
             })
-            .when('/about', {
-                templateUrl: 'test.html'
-        })
+            .when('/rooms', {
+                templateUrl: 'partials/rooms.html',
+                controller: 'roomController'
+            })
 
         $locationProvider.html5Mode({
             enabled: true,

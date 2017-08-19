@@ -1,10 +1,6 @@
-var app = angular.module('plotTwist', ['appRoutes'])
-.controller('mainController', function($scope) {
-    $scope.submitInfo = function(){
-        console.log('submitted')
-        var client = {};
-        client.socket = io.connect();
-        client.socket.emit('clientInfo',{name: $scope.name,age:$scope.age});
-
-    }
-})
+//Main angular module.  Imports all other modules
+var plotTwist = angular.module('plotTwist', ['appRoutes',
+    'mainController',
+    'roomController',
+    'roomService',
+    'btford.socket-io',])
