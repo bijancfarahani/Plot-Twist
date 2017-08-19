@@ -1,0 +1,6 @@
+.idea
+.DS_Store
+public/.DS_Store
+node_modules
+public/bower_components
+public/assets
