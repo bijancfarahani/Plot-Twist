@@ -1,0 +1,9 @@
+{
+	"name": "plotTwist",
+	"main": "server.js",
+	"dependencies": {
+
+		"angular": "^1.5.2",
+		"angular-route": "^1.5.2"
+	}
+}
