@@ -2,5 +2,9 @@
 var plotTwist = angular.module('plotTwist', ['appRoutes',
     'mainController',
     'roomController',
-    'roomService',
     'btford.socket-io',])
+plotTwist.run(function(socket) {
+    console.log('in run');
+    console.log(window.sessionStorage.getItem('clientInfo'));
+    socket.emit('register',window.sessionStorage.getItem('clientInfo'));
+});
