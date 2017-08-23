@@ -1,9 +1,8 @@
 var express = require('express');
 var app = express();
 var path = require('path');
-var morgan = require('morgan');
 var http = require('http').Server(app);
-var io = require('socket.io')(http, {pingInterval: 100000});
+var io = require('socket.io')(http, {pingInterval: 600000});
 
 
 
@@ -13,30 +12,29 @@ app.get('*', function(req,res) {
     res.sendFile(path.join(__dirname + '/../public/index.html'));
 });
 //global list of all currently connected clients
-var sockets = [];
+var clients = [];
 
 //Define the room object for easier room data management
 function Room(roomName) {
     this.roomName = roomName;
     this.roomSize = 0;
     this.roomClients = [];
+    this.numReady = 0;
+    this.hasBegun = false;
 }
+//Room toString
 Room.prototype.toString = function roomToString() {
     return this.roomName;
-}
+};
 //array of four instances of rooms
 var rooms =[new Room('room1'),new Room('room2'), new Room('room3'), new Room('room4')];
 
 io.on('connection', function(socket){
-  socket.on('register', function(clientInfo) {
-    if(clientInfo) {
-        console.log('there is client info')
-        sockets[socket.id] = clientInfo;
-    }
-    else {
-        console.log('there is no client info');
-    }
-  });
+
+    socket.on('register', function(clientInfo) {
+      clients[socket.id] = clientInfo;
+      console.log(clients[socket.id]);
+    });
 
   socket.on('roomsRequest', function() {
       socket.emit('roomInfo', rooms);
@@ -44,22 +42,60 @@ io.on('connection', function(socket){
 
   socket.on('joinRoom', function(roomToJoin) {
       console.log(roomToJoin);
-    if((roomToJoin.hasJoinedRoom == 'false')) {
-        console.log('in if');
-      socket.join(rooms[roomToJoin.roomIndex].roomName);
-      rooms[roomToJoin.roomIndex].roomSize += 1;
-      sockets[socket.id].inRoom = true;
-      rooms[roomToJoin.roomIndex].roomClients.push(sockets[socket.id]);
-      socket.emit('joinedRoom');
-    }
-    console.log(rooms);
-    console.log(io.sockets.adapter.rooms);
+      if((roomToJoin.hasJoinedRoom === 'false')) { //if iit breaks, check this
+          socket.join(rooms[roomToJoin.roomIndex].roomName); //get the string name of a room and join it
+          rooms[roomToJoin.roomIndex].roomSize += 1; //increase the size of that room
+          rooms[roomToJoin.roomIndex].roomClients.push(socket.id); //set client object in the room
+          socket.emit('joinedRoom');
+      }
+      console.log(rooms);
   });
 
+  socket.on('clientReady', function() {
+      clients[socket.id].isReady = true;
+      console.log(clients[socket.id]);
+  });
+
+  socket.on('clientNotReady', function() {
+      clients[socket.id].isReady = false;
+      console.log(clients[socket.id]);
+  });
+
+  function initGame() {
+      for(var i = 0; i < rooms.length; i++) {
+          rooms[i].numReady = 0;
+          for(var j = 0; j < rooms[i].roomClients.length; j++) {
+              if(clients[rooms[i].roomClients[j]] != undefined && clients[rooms[i].roomClients[j]].isReady) {
+                  rooms[i].numReady++;
+              }
+          }
+          if(rooms[i].numReady === rooms[i].roomSize) {
+              io.in(rooms[i].roomName).emit('initGame');
+          }
+      }
+  }
+
+  setInterval(function() {
+      initGame();
+  }, 1000);
+
   socket.on('disconnect', function(){
+      //remove the client from their room if they are in one
+      for(var i = 0; i < rooms.length; i++) {
+          for(var j = 0; j < rooms[i].roomClients.length; j++) {
+              if(rooms[i].roomClients[j] === socket.id) { //if it breaks, this is why
+                  delete rooms[i].roomClients[j];
+                  rooms[i].roomSize--;
+                  break;
+              }
+          }
+      }
+      //remove the socket from the global list
+      delete clients[socket.id];
       console.log(socket.id + ' disconnected');
   });
 });
+
 
 http.listen(3000,function() {
 	console.log('listening on ' + 3000);

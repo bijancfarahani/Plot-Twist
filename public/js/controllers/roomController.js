@@ -1,19 +1,22 @@
 var app = angular.module('roomController',[])
-.controller('roomController',function($scope,socket) {
-    var roomRefresh = setInterval(function() {
+.controller('roomController',function($scope,$location, socket) {
+
+    setInterval(function() {
         socket.emit('roomsRequest');
     }, 1000);
     socket.on('roomInfo',function(roomInfo) {
         $scope.rooms = roomInfo;
     });
 
+    var roomIndex;
     socket.on('joinedRoom', function() {
-        window.sessionStorage.setItem('hasJoinedRoom',true)
-    })
+        window.sessionStorage.setItem('hasJoinedRoom','true');
+        window.sessionStorage.setItem('inRoom', roomIndex);
+        $location.path('/inRoom');
+    });
 
     $scope.joinRoom = function(key) {
         console.log('joinRoom executed, with room: ' + key);
-        var roomIndex;
         switch(key) {
             case 0:
                 roomIndex = 0;
@@ -27,6 +30,9 @@ var app = angular.module('roomController',[])
             case 3:
                 roomIndex = 3;
         }
-        socket.emit('joinRoom',{roomIndex: roomIndex, hasJoinedRoom: window.sessionStorage.getItem('hasJoinedRoom')});
+        socket.emit('joinRoom',{
+            roomIndex: roomIndex,
+            hasJoinedRoom: window.sessionStorage.getItem('hasJoinedRoom')
+        });
     }
 });
