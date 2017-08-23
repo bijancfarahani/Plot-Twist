@@ -19,7 +19,7 @@ function Room(roomName) {
     this.roomName = roomName;
     this.roomSize = 0;
     this.roomClients = [];
-    this.numReady = 0;
+    this.readyStates = [];
     this.hasBegun = false;
 }
 //Room toString
@@ -42,11 +42,14 @@ io.on('connection', function(socket){
 
   socket.on('joinRoom', function(roomToJoin) {
       console.log(roomToJoin);
-      if((roomToJoin.hasJoinedRoom === 'false')) { //if iit breaks, check this
-          socket.join(rooms[roomToJoin.roomIndex].roomName); //get the string name of a room and join it
-          rooms[roomToJoin.roomIndex].roomSize += 1; //increase the size of that room
-          rooms[roomToJoin.roomIndex].roomClients.push(socket.id); //set client object in the room
-          socket.emit('joinedRoom');
+      if((roomToJoin.hasJoinedRoom === 'false')
+          && rooms[roomToJoin.roomIndex].roomSize < 4
+          && !rooms[roomToJoin.roomIndex].hasBegun) {
+              console.log('in if')
+              socket.join(rooms[roomToJoin.roomIndex].roomName); //get the string name of a room and join it
+              rooms[roomToJoin.roomIndex].roomSize += 1; //increase the size of that room
+              rooms[roomToJoin.roomIndex].roomClients.push(socket.id); //set client object in the room
+              socket.emit('joinedRoom');
       }
       console.log(rooms);
   });
@@ -63,14 +66,20 @@ io.on('connection', function(socket){
 
   function initGame() {
       for(var i = 0; i < rooms.length; i++) {
-          rooms[i].numReady = 0;
+          rooms[i].readyStates = [];
           for(var j = 0; j < rooms[i].roomClients.length; j++) {
-              if(clients[rooms[i].roomClients[j]] != undefined && clients[rooms[i].roomClients[j]].isReady) {
-                  rooms[i].numReady++;
+              if(clients[rooms[i].roomClients[j]] !== undefined && clients[rooms[i].roomClients[j]].isReady) {
+                  rooms[i].readyStates.push(true);
               }
           }
-          if(rooms[i].numReady === rooms[i].roomSize) {
+          for(var isReady in rooms[i].readyStates) {
+              var allReady = true;
+              if(!isReady)
+                  allReady = false;
+          }
+          if(allReady) {
               io.in(rooms[i].roomName).emit('initGame');
+              rooms[i].hasBegun = true;
           }
       }
   }
