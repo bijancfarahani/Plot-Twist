@@ -36,8 +36,17 @@ io.on('connection', function(socket){
       console.log(clients[socket.id]);
     });
 
+    //rewrite this to be better later
   socket.on('roomsRequest', function() {
-      socket.emit('roomInfo', rooms);
+      var roomData = rooms;
+      for(var i = 0; i < rooms.length; i++) {
+          for(var j = 0; j <rooms[i].roomClients.length; j++) {
+              if(clients[rooms[i].roomClients[j]] !== undefined) {
+                  roomData[i].roomClients[j] = clients[rooms[i].roomClients[j]].userName;
+              }
+          }
+      }
+      socket.emit('roomInfo', roomData);
   });
 
   socket.on('joinRoom', function(roomToJoin) {
@@ -64,29 +73,6 @@ io.on('connection', function(socket){
       console.log(clients[socket.id]);
   });
 
-  function initGame() {
-      for(var i = 0; i < rooms.length; i++) {
-          rooms[i].readyStates = [];
-          for(var j = 0; j < rooms[i].roomClients.length; j++) {
-              if(clients[rooms[i].roomClients[j]] !== undefined && clients[rooms[i].roomClients[j]].isReady) {
-                  rooms[i].readyStates.push(true);
-              }
-          }
-          for(var isReady in rooms[i].readyStates) {
-              var allReady = true;
-              if(!isReady)
-                  allReady = false;
-          }
-          if(allReady) {
-              io.in(rooms[i].roomName).emit('initGame');
-              rooms[i].hasBegun = true;
-          }
-      }
-  }
-
-  setInterval(function() {
-      initGame();
-  }, 1000);
 
   socket.on('disconnect', function(){
       //remove the client from their room if they are in one
@@ -105,6 +91,29 @@ io.on('connection', function(socket){
   });
 });
 
+
+function initGame() {
+    for(var i = 0; i < rooms.length; i++) {
+        rooms[i].readyStates = [];
+        for(var j = 0; j < rooms[i].roomClients.length; j++) {
+            if(clients[rooms[i].roomClients[j]] !== undefined && clients[rooms[i].roomClients[j]].isReady) {
+                rooms[i].readyStates.push(true);
+            }
+        }
+        for(var isReady in rooms[i].readyStates) {
+            var allReady = true;
+            if(!isReady)
+                allReady = false;
+        }
+        if(allReady) {
+            io.in(rooms[i].roomName).emit('initGame');
+            rooms[i].hasBegun = true;
+        }
+    }
+}
+setInterval(function() {
+    initGame();
+}, 1000);
 
 http.listen(3000,function() {
 	console.log('listening on ' + 3000);

@@ -1,0 +1,87 @@
+body {
+    background-color: #331E36;
+}
+h1 {
+    position: fixed;
+    left: 50%;
+    top:0%;
+    transform: translate(-50%, -50%);
+    font-size: 100px;
+    color: #ECFEE8;
+    font-family: 'Lato', sans-serif;
+}
+.clientInput {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+.dataInput {
+    border: 0;
+    outline: 0;
+    background: transparent;
+    border-bottom: 1px solid whitesmoke;
+}
+input {
+    background-color: #331E36;
+    border: 0;
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    font-size: 36px;
+    color: #ECFEE8;
+}
+
+.rooms {
+    position: fixed;
+    left: 50%;
+    top:50%;
+    width: 100%;
+    transform: translate(-50%, -50%);
+    color: #ECFEE8;
+    font-size: 20px;
+    padding: 20px;
+}
+.singleRoom {
+    border-width: 2px;
+    border-style: solid;
+    border-color: #C2EFEB;
+    padding: 20px;
+}
+.clientsInRoom {
+    float: left;
+}
+
+::-webkit-input-placeholder { /* Chrome */
+    color: #ECFEE8;
+    font-style: italic;
+    font-size: smaller;
+
+}
+:-ms-input-placeholder { /* IE 10+ */
+    color: #ECFEE8;
+    font-style: italic;
+
+}
+::-moz-placeholder { /* Firefox 19+ */
+    color: #ECFEE8;
+    opacity: 1;
+    font-style: italic;
+
+}
+:-moz-placeholder { /* Firefox 4 - 18 */
+    color: #ECFEE8;
+    opacity: 1;
+    font-style: italic;
+
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0;
+}

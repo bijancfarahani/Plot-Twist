@@ -5,6 +5,7 @@ var app = angular.module('roomController',[])
         socket.emit('roomsRequest');
     }, 1000);
     socket.on('roomInfo',function(roomInfo) {
+        console.log(roomInfo);
         $scope.rooms = roomInfo;
     });
 
