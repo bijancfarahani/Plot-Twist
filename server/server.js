@@ -12,6 +12,15 @@ app.get('*', function(req,res) {
     res.sendFile(path.join(__dirname + '/../public/index.html'));
 });
 //global list of all currently connected clients
+function Client(clientInfo) {
+    for (var fld in clientInfo) {
+        this[fld] = clientInfo[fld];
+    }
+    this.playerNo = null;
+}
+Client.prototype.toString = function clientToString() {
+    return this.userName + this.userID;
+}
 var clients = [];
 
 //Define the room object for easier room data management
@@ -19,7 +28,6 @@ function Room(roomName) {
     this.roomName = roomName;
     this.roomSize = 0;
     this.roomClients = [];
-    this.readyStates = [];
     this.hasBegun = false;
 }
 //Room toString
@@ -32,32 +40,22 @@ var rooms =[new Room('room1'),new Room('room2'), new Room('room3'), new Room('ro
 io.on('connection', function(socket){
 
     socket.on('register', function(clientInfo) {
-      clients[socket.id] = clientInfo;
-      console.log(clients[socket.id]);
+        clients[socket.id] = new Client(clientInfo);
     });
 
     //rewrite this to be better later
   socket.on('roomsRequest', function() {
-      var roomData = rooms;
-      for(var i = 0; i < rooms.length; i++) {
-          for(var j = 0; j <rooms[i].roomClients.length; j++) {
-              if(clients[rooms[i].roomClients[j]] !== undefined) {
-                  roomData[i].roomClients[j] = clients[rooms[i].roomClients[j]].userName;
-              }
-          }
-      }
-      socket.emit('roomInfo', roomData);
+      socket.emit('roomInfo', rooms);
   });
 
   socket.on('joinRoom', function(roomToJoin) {
-      console.log(roomToJoin);
       if((roomToJoin.hasJoinedRoom === 'false')
           && rooms[roomToJoin.roomIndex].roomSize < 4
           && !rooms[roomToJoin.roomIndex].hasBegun) {
-              console.log('in if')
               socket.join(rooms[roomToJoin.roomIndex].roomName); //get the string name of a room and join it
               rooms[roomToJoin.roomIndex].roomSize += 1; //increase the size of that room
-              rooms[roomToJoin.roomIndex].roomClients.push(socket.id); //set client object in the room
+              clients[socket.id].playerNo = (rooms[roomToJoin.roomIndex].roomClients.push(clients[socket.id])) - 1; //set client object in the room
+              clients[socket.id].inRoom = roomToJoin.roomIndex;
               socket.emit('joinedRoom');
       }
       console.log(rooms);
@@ -66,6 +64,15 @@ io.on('connection', function(socket){
   socket.on('clientReady', function() {
       clients[socket.id].isReady = true;
       console.log(clients[socket.id]);
+      var allReady = true;
+      for(var i = 0; i < rooms[clients[socket.id].inRoom].roomClients.length; i++) {
+          if(!rooms[clients[socket.id].inRoom].roomClients[i].isReady)
+              allReady = false;
+      }
+      if(allReady) {
+          io.in(rooms[clients[socket.id].inRoom].roomName).emit('initGame');
+          rooms[clients[socket.id].inRoom].hasBegun = true;
+      }
   });
 
   socket.on('clientNotReady', function() {
@@ -76,44 +83,21 @@ io.on('connection', function(socket){
 
   socket.on('disconnect', function(){
       //remove the client from their room if they are in one
-      for(var i = 0; i < rooms.length; i++) {
-          for(var j = 0; j < rooms[i].roomClients.length; j++) {
-              if(rooms[i].roomClients[j] === socket.id) { //if it breaks, this is why
-                  delete rooms[i].roomClients[j];
-                  rooms[i].roomSize--;
-                  break;
-              }
+      var roomIndex  = clients[socket.id].inRoom;
+      if(roomIndex !== null) {
+          rooms[roomIndex].roomSize--;
+          rooms[roomIndex].roomClients.splice(clients[socket.id].playerNo,1);
+          if(rooms[roomIndex].roomSize === 0) {
+              rooms[roomIndex].hasBegun = false;
           }
       }
       //remove the socket from the global list
       delete clients[socket.id];
-      console.log(socket.id + ' disconnected');
   });
 });
 
 
-function initGame() {
-    for(var i = 0; i < rooms.length; i++) {
-        rooms[i].readyStates = [];
-        for(var j = 0; j < rooms[i].roomClients.length; j++) {
-            if(clients[rooms[i].roomClients[j]] !== undefined && clients[rooms[i].roomClients[j]].isReady) {
-                rooms[i].readyStates.push(true);
-            }
-        }
-        for(var isReady in rooms[i].readyStates) {
-            var allReady = true;
-            if(!isReady)
-                allReady = false;
-        }
-        if(allReady) {
-            io.in(rooms[i].roomName).emit('initGame');
-            rooms[i].hasBegun = true;
-        }
-    }
-}
-setInterval(function() {
-    initGame();
-}, 1000);
+
 
 http.listen(3000,function() {
 	console.log('listening on ' + 3000);

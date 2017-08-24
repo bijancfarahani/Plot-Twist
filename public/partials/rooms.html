@@ -1,13 +1,15 @@
-<div class="rooms">
+<div class="roomsList">
     <h2>Game Rooms</h2>
-    <div ng-repeat="(key,value) in rooms track by $index">
-        <div class="singleRoom">
-            <h2>Room {{key + 1}}</h2>  <button ng-click="joinRoom(key)">Join Room</button>
-            <h3>Connected Players</h3>
-            <div class='clientsInRoom' ng-repeat="name in value.roomClients track by $index">
-                <h4>{{name}}</h4>
-            </div>
-
+    <div class="singleRoom" ng-repeat="(key,value) in rooms track by $index">
+        <div>
+            <h2>Room {{key + 1}}</h2>
+            <button class='joinButton' ng-click="joinRoom(key)">Join Room</button>
         </div>
+        <div>Connected Players
+            <div class='clientsInRoom' ng-repeat="name in value.roomClients track by $index">
+                <h4 ng-if="name.userName">{{name.userName}}, </h4>
+            </div>
+        </div>
+
     </div>
 </div>

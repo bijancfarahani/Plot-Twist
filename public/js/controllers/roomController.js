@@ -1,14 +1,17 @@
 var app = angular.module('roomController',[])
-.controller('roomController',function($scope,$location, socket) {
-
-    setInterval(function() {
+.controller('roomController',function($scope,$location,$interval, $rootScope,socket) {
+    $scope.stop = $interval(function() {
         socket.emit('roomsRequest');
     }, 1000);
+
+    var endRoomRequest = $rootScope.$on('$locationChangeSuccess', function() {
+        $interval.cancel($scope.stop);
+        endRoomRequest();
+    });
     socket.on('roomInfo',function(roomInfo) {
         console.log(roomInfo);
         $scope.rooms = roomInfo;
     });
-
     var roomIndex;
     socket.on('joinedRoom', function() {
         window.sessionStorage.setItem('hasJoinedRoom','true');
@@ -36,4 +39,5 @@ var app = angular.module('roomController',[])
             hasJoinedRoom: window.sessionStorage.getItem('hasJoinedRoom')
         });
     }
+
 });

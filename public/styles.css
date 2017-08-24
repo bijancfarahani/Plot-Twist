@@ -7,7 +7,7 @@ h1 {
     top:0%;
     transform: translate(-50%, -50%);
     font-size: 100px;
-    color: #ECFEE8;
+    color: #41337A;
     font-family: 'Lato', sans-serif;
 }
 .clientInput {
@@ -21,7 +21,7 @@ h1 {
     border: 0;
     outline: 0;
     background: transparent;
-    border-bottom: 1px solid whitesmoke;
+    border-bottom: 1px solid #6EA4BF;
 }
 input {
     background-color: #331E36;
@@ -31,48 +31,68 @@ input {
     margin: 8px 0;
     box-sizing: border-box;
     font-size: 36px;
-    color: #ECFEE8;
+    color: #6EA4BF;
 }
 
-.rooms {
+.roomsList {
     position: fixed;
     left: 50%;
     top:50%;
-    width: 100%;
+    width: 30%;
     transform: translate(-50%, -50%);
-    color: #ECFEE8;
+    border-radius: 25px;
+    color: #6EA4BF;
     font-size: 20px;
-    padding: 20px;
 }
 .singleRoom {
-    border-width: 2px;
+    display: flex;
+    border-width: 1px;
     border-style: solid;
     border-color: #C2EFEB;
-    padding: 20px;
+    border-spacing: 2px;
+    padding: 5px 5px 5px 5px;
+}
+.singleRoom > div {
+    flex: 1;
 }
 .clientsInRoom {
     float: left;
 }
+.joinButton {
+    background-color: #6EA4BF;
+    border: none;
+    font-size: 16px;
+    color: #ECFEE8;
+}
+
+.setReadyState {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+
+}
 
 ::-webkit-input-placeholder { /* Chrome */
-    color: #ECFEE8;
+    color: #6EA4BF;
     font-style: italic;
     font-size: smaller;
 
 }
 :-ms-input-placeholder { /* IE 10+ */
-    color: #ECFEE8;
+    color: #6EA4BF;
     font-style: italic;
 
 }
 ::-moz-placeholder { /* Firefox 19+ */
-    color: #ECFEE8;
+    color: #6EA4BF;
     opacity: 1;
     font-style: italic;
 
 }
 :-moz-placeholder { /* Firefox 4 - 18 */
-    color: #ECFEE8;
+    color: #6EA4BF;
     opacity: 1;
     font-style: italic;
 
