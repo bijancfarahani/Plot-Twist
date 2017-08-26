@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var path = require('path');
+var deck = require('./deckManager');
 var http = require('http').Server(app);
 var io = require('socket.io')(http, {pingInterval: 600000});
 
@@ -72,6 +73,8 @@ io.on('connection', function(socket){
       if(allReady) {
           io.in(rooms[clients[socket.id].inRoom].roomName).emit('initGame');
           rooms[clients[socket.id].inRoom].hasBegun = true;
+          deck.shuffle();
+          console.log(deck.deck);
       }
   });
 
@@ -80,19 +83,25 @@ io.on('connection', function(socket){
       console.log(clients[socket.id]);
   });
 
+  socket.on('reqCard', function() {
+      console.log('in reqCard');
+      socket.emit('receiveCard', deck.deck)
+    });
 
   socket.on('disconnect', function(){
       //remove the client from their room if they are in one
-      var roomIndex  = clients[socket.id].inRoom;
-      if(roomIndex !== null) {
-          rooms[roomIndex].roomSize--;
-          rooms[roomIndex].roomClients.splice(clients[socket.id].playerNo,1);
-          if(rooms[roomIndex].roomSize === 0) {
-              rooms[roomIndex].hasBegun = false;
+      if(clients[socket.id] !== undefined) {
+          var roomIndex = clients[socket.id].inRoom;
+          if (roomIndex !== null) {
+              rooms[roomIndex].roomSize--;
+              rooms[roomIndex].roomClients.splice(clients[socket.id].playerNo, 1);
+              if (rooms[roomIndex].roomSize === 0) {
+                  rooms[roomIndex].hasBegun = false;
+              }
           }
+          //remove the socket from the global list
+          delete clients[socket.id];
       }
-      //remove the socket from the global list
-      delete clients[socket.id];
   });
 });
 
