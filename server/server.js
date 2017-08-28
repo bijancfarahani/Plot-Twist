@@ -59,7 +59,6 @@ io.on('connection', function(socket){
               clients[socket.id].inRoom = roomToJoin.roomIndex;
               socket.emit('joinedRoom');
       }
-      console.log(rooms);
   });
 
   socket.on('clientReady', function() {
@@ -74,7 +73,6 @@ io.on('connection', function(socket){
           io.in(rooms[clients[socket.id].inRoom].roomName).emit('initGame');
           rooms[clients[socket.id].inRoom].hasBegun = true;
           deck.shuffle();
-          console.log(deck.deck);
       }
   });
 
@@ -83,9 +81,14 @@ io.on('connection', function(socket){
       console.log(clients[socket.id]);
   });
 
-  socket.on('reqCard', function() {
+  socket.on('getInitialCards', function() {
       console.log('in reqCard');
-      socket.emit('receiveCard', deck.deck)
+      var cards = [];
+      for(var i = 0; i < 9; i++) {
+          cards.push(deck.deck[0]);
+          deck.deck.splice(0,1);
+      }
+      socket.emit('cardsGot', cards);
     });
 
   socket.on('disconnect', function(){
@@ -101,12 +104,10 @@ io.on('connection', function(socket){
           }
           //remove the socket from the global list
           delete clients[socket.id];
+          //ADD SOCKET.LEVAE(ROOM)
       }
   });
 });
-
-
-
 
 http.listen(3000,function() {
 	console.log('listening on ' + 3000);
