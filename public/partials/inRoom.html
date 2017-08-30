@@ -1,9 +1,13 @@
-<div class="setReadyState">Check this when you are ready to begin the game!
-    <input
+
+<div class="setReadyState">Check the box on the left when you are ready to begin the game!
+    <input id="readyBox"
            ng-model="isReady"
            ng-click="setReadyStatus(isReady)"
            ng-true-value='1'
            ng-false-value='0'
            type="checkbox"
     />
+    <div class="roomClients" ng-repeat="client in roomClients track by $index">
+        <h2 id="clientStatus">{{client.userName}}: {{client.isReady}} </h2>
+    </div>
 </div>

@@ -1,5 +1,18 @@
 var app = angular.module('inRoomController',[])
-.controller('inRoomController', function($scope,socket,$location) {
+.controller('inRoomController', function($scope,$rootScope,socket,$location,$interval) {
+    $scope.stop = $interval(function() {
+        socket.emit('requestThisRoom', {roomIndex: window.sessionStorage.getItem('inRoom')});
+    }, 1000);
+    var endRoomRequest = $rootScope.$on('$locationChangeSuccess', function() {
+        $interval.cancel($scope.stop);
+        endRoomRequest();
+    });
+
+    socket.on('thisRoomInfo', function(roomClients) {
+        console.log(roomClients);
+        $scope.roomClients = roomClients;
+
+    });
 
     socket.on('initGame', function() {
         $location.path('/game');

@@ -12,24 +12,25 @@
     <!-- Angular files -->
     <script src="./app.js"></script>
     <script src="./routes.js"></script>
-    <script src="./js/controllers/mainController.js"></script>
-    <script src="./js/controllers/roomController.js"></script>
     <script src="./bower_components/socket.io-client/dist/socket.io.js"></script>
     <script src="./bower_components/angular-socket-io/socket.js"></script>
+    <!-- Angular Controllers -->
     <script src="./js/services/socketFactory.js"></script>
-    <script src="js/controllers/inRoomController.js"></script>
-    <script src = ./js/controllers/gameController.js></script>
+    <script src="./js/controllers/mainController.js"></script>
+    <script src="./js/controllers/roomController.js"></script>
+    <script src="./js/controllers/inRoomController.js"></script>
+    <script src ="./js/controllers/gameController.js"></script>
+    <!-- Phaser Files -->
     <script type="text/javascript" src="./js/phaser.min.js"></script>
     <script type="text/javascript" src="js/gameStates/initialDeal.js"></script>
     <script type="text/javascript" src="js/gameStates/assetLoad.js"></script>
-
-
+    <script type="text/javascript" src="js/gameStates/playerTurn.js"></script>
+    <script type="text/javascript" src="js/gameStates/Card.js"></script>
 
     <title>Plot Twist</title>
 </head>
 <h1>Plot Twist</h1>
 <body ng-app="plotTwist">
-<div ng-view></div>
+    <div ng-view></div>
 </body>
-
 </html>

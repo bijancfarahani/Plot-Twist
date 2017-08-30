@@ -10,6 +10,7 @@ h1 {
     color: #41337A;
     font-family: 'Lato', sans-serif;
 }
+
 .clientInput {
     position: fixed;
     top: 50%;
@@ -70,8 +71,20 @@ input {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+    font-size: 32px;
+    color: #ECFEE8;
+}
 
-
+#clientStatus {
+    float: left;
+}
+h2 {
+    margin: 5px;
+}
+#readyBox {
+    transform: scale(2);
+    -ms-transform: scale(2);
+    -webkit-transform: scale(2);
 }
 
 #gameDiv {
