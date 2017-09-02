@@ -14,7 +14,6 @@ var initialDeal = {
                 card.scale.setTo(0.3);
                 card.inputEnabled = true;
                 card.events.onInputDown.add(function (card) {
-                    card.hasBeenClicked = true;
                     initialDeal.cardsSelected++;
                     for(var cardIndex = 0; cardIndex < game.playerHand.length; cardIndex++) {
                         if (game.playerHand[cardIndex].cardName === card.name) {
@@ -24,9 +23,8 @@ var initialDeal = {
                     }
                     card.destroy();
                     if(initialDeal.cardsSelected === 5) {
-                        game.state.start('playerTurn');
+                        game.state.start('playerDraw');
                     }
-
                 }, this);
                 data.splice(0, 1);
             }
@@ -37,7 +35,6 @@ var initialDeal = {
                 card.scale.setTo(0.3);
                 card.inputEnabled = true;
                 card.events.onInputDown.add(function (card) {
-                    card.hasBeenClicked = true;
                     initialDeal.cardsSelected++;
                     for(var cardIndex = 0; cardIndex < game.playerHand.length; cardIndex++) {
                         if (game.playerHand[cardIndex].cardName === card.name) {
@@ -47,7 +44,7 @@ var initialDeal = {
                     }
                     card.destroy();
                     if(initialDeal.cardsSelected === 5) {
-                        game.state.start('playerTurn');
+                        game.state.start('playerDraw');
                     }
                 }, this);
                 data.splice(0, 1);

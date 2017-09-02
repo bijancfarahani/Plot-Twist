@@ -119,20 +119,46 @@ io.on('connection', function(socket){
     /*After all players have chosen initial cards, let the youngest player
     know that they can go first*/
     socket.on('initDone', function() {
+        console.log('in initDOne');
         var roomIndex = clients[socket.id].inRoom;
         rooms[roomIndex].initCompleted++;
         console.log(rooms[roomIndex].roomSize + ' ' + rooms[roomIndex].initCompleted);
         if(rooms[roomIndex].initCompleted === rooms[roomIndex].roomSize) {
+            decks[roomIndex].setThinkTank();
             var youngestPlayer = rooms[roomIndex].youngestPlayer();
             console.log(youngestPlayer.socketID);
             console.log(socket.id);
+            var cardData = {deckCard:decks[roomIndex].deck[0],
+                thinkTank: decks[roomIndex].thinkTank,
+                discardCard:decks[roomIndex].discardPileTop()};
             if(youngestPlayer.socketID === socket.id) {
-                socket.emit('beginTurn');
+                socket.emit('beginTurn',cardData);
             }
             else {
-                socket.broadcast.to(youngestPlayer.socketID).emit('beginTurn');
+                socket.broadcast.to(youngestPlayer.socketID).emit('beginTurn',cardData);
             }
         }
+    });
+    socket.on('requestTableCards', function() {
+        var cardData = {deckCard:decks[roomIndex].deck[0],
+            thinkTank: decks[roomIndex].thinkTank,
+            discardCard:decks[roomIndex].discardPileTop()};
+        socket.emit('beginTurn',cardData);
+    });
+    socket.on('thinkTankUpdate', function(updatedThinkTank) {
+        var roomIndex = clients[socket.id].inRoom;
+        decks[roomIndex].thinkTank = updatedThinkTank;
+        console.log(decks[roomIndex].thinkTank);
+    });
+    //Client removes the top card from the deck
+    socket.on('deckCardTaken', function() {
+       console.log(decks[clients[socket.id].inRoom].deck);
+       decks[clients[socket.id].inRoom].deck.splice(0,1);
+    });
+    socket.on('discardCardTaken', function() {
+        var roomIndex = clients[socket.id].inRoom;
+        var lastCard = decks[roomIndex].discardPileTop();
+        decks[roomIndex].discardPile.splice(lastCard,1);
     });
     //Handler for when a client disconnects
     socket.on('disconnect', function(){

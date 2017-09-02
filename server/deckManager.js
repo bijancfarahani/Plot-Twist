@@ -1,4 +1,6 @@
 var deck = [];
+var thinkTank = [];
+var discardPile = [new Card('ahah','garden','fdsa',2)];
 function Card(cardType,name,story,act) {
     this.cardType = cardType;
     this.cardName = name;
@@ -104,6 +106,13 @@ declarePeterPanCards();
 declareRidingHoodCards();
 
 module.exports.deck = deck;
+module.exports.thinkTank = thinkTank;
+module.exports.discardPile = discardPile;
+module.exports.discardPileTop = function() {
+    if(discardPile.length === 0)
+        return null;
+    return discardPile[discardPile.length - 1];
+};
 module.exports.shuffle = function() {
     var l,x,j;
     for (l = deck.length; l; l--) {
@@ -113,8 +122,16 @@ module.exports.shuffle = function() {
         deck[j] = x;
     }
 };
+module.exports.setThinkTank = function() {
+    for(var i = 0; i < 3; i++) {
+        thinkTank.push(deck[0]);
+        deck.splice(0,1);
+    }
+};
 module.exports.resetDeck = function() {
     deck.length = 0;
+    thinkTank.length = 0;
+    discardPile.length = 0;
     declareAliceCards();
     declareCinderellaCards();
     declarePeterPanCards();

@@ -7,6 +7,8 @@ var app = angular.module('gameController',[])
         //Arrays for the players hand and story
         game.playerHand = [];
         game.playerStory = [];
+        game.thinkTank = [];
+        game.firstMove = true;
         //get other players info
         socket.emit('getOtherPlayers',{roomIndex: window.sessionStorage.getItem('inRoom')});
         socket.on('otherPlayersInfo',function(roomClients) {
@@ -20,6 +22,7 @@ var app = angular.module('gameController',[])
         //Add various game states and start with asset loading
         game.state.add('assetLoad',assetLoad);
         game.state.add('initialDeal',initialDeal);
+        game.state.add('playerDraw', playerDraw);
         game.state.add('playerTurn', playerTurn);
         game.state.start("assetLoad");
     });
