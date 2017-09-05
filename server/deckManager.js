@@ -1,6 +1,6 @@
 var deck = [];
 var thinkTank = [];
-var discardPile = [new Card('ahah','garden','fdsa',2)];
+var discardPile = [];
 function Card(cardType,name,story,act) {
     this.cardType = cardType;
     this.cardName = name;

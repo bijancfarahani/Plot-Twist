@@ -4,6 +4,7 @@ var playerTurn = {
     selectedHandStoryCard: null,
     create: function() {
         playerTurn.game = this.game;
+        //define and draw the player hand cards
         playerTurn.handGroup = this.game.add.group();
         playerTurn.handGroup.scale.setTo(0.3);
         playerTurn.handGroup.inputEnableChildren = true;
@@ -14,6 +15,7 @@ var playerTurn = {
             }
             playerTurn.handGroup.add(cardSprite);
         }
+        //define and draw the player story cards
         this.game.storyGroup = this.game.add.group();
         this.game.storyGroup.scale.setTo(0.25);
         this.game.storyGroup.inputEnableChildren = true;
@@ -24,28 +26,31 @@ var playerTurn = {
     },
     update: function() {
     },
+    //select a story card from the hand to swap or nullify a selection
     selectHandCardToSwap: function(handSprite) {
         if(playerTurn.selectedHandStoryCard === null)
             playerTurn.selectedHandStoryCard = handSprite.key;
         else
             playerTurn.selectedHandStoryCard = null;
-        console.log(playerTurn.selectedHandStoryCard);
     },
     selectStoryCardToSwap: function(storySprite) {
         if (playerTurn.selectedHandStoryCard === null)
             return;
+        //change the card texture to that from the hand card
         var storyCard = storySprite.key;
         storySprite.loadTexture(playerTurn.selectedHandStoryCard);
         var handCard;
         var handCardIndex;
+        //find the card in the player hand
         for(var i = 0; i < playerTurn.game.playerHand.length; i++)  {
             if(playerTurn.game.playerHand[i].cardName === playerTurn.selectedHandStoryCard) {
                 handCard = playerTurn.game.playerHand[i];
                 handCardIndex = i;
-                console.log(handCard);
                 break;
             }
         }
+        //find the story card and change it to the card in the hand
+        //let the server know to add the old card to the discard pile
         for(var i = 0; i < playerTurn.game.playerStory.length; i++)  {
             if(playerTurn.game.playerStory[i].cardName === storyCard) {
                 storyCard = playerTurn.game.playerStory[i];
@@ -53,8 +58,8 @@ var playerTurn = {
                 playerTurn.handGroup.removeChildAt(handCardIndex);
                 console.log(playerTurn.handGroup);
                 playerTurn.game.socket.emit('toDiscardPile',storyCard);
+                break;
             }
         }
     }
-
 };

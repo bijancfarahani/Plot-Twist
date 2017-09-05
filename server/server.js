@@ -41,6 +41,9 @@ function Room(roomName,roomIndex) {
         return youngest;
     }
 }
+function clientRoom(socketID) {
+    return clients[socketID].inRoom;
+}
 //Room toString
 Room.prototype.toString = function roomToString() {
     return this.roomName;
@@ -77,6 +80,7 @@ io.on('connection', function(socket){
         }
     });
 
+    //Todo: refactor so this does not take an object, but a literal
     socket.on('requestThisRoom', function(roomIndex) {
         socket.emit('thisRoomInfo',rooms[roomIndex.roomIndex].roomClients);
     });
@@ -87,31 +91,35 @@ io.on('connection', function(socket){
         clients[socket.id].isReady = true;
         //Check if all clients in the room are ready
         var allReady = true;
-        for(var i = 0; i < rooms[clients[socket.id].inRoom].roomClients.length; i++) {
+        var roomIndex = clientRoom(socket.id);
+        for(var i = 0; i < rooms[roomIndex].roomClients.length; i++) {
             if(!rooms[clients[socket.id].inRoom].roomClients[i].isReady)
                 allReady = false;
         }
         //If all clients are ready, update room status, and tell clients to start the game
         if(allReady) {
-            rooms[clients[socket.id].inRoom].hasBegun = true;
-            decks[clients[socket.id].inRoom].shuffle();
-            io.in(rooms[clients[socket.id].inRoom].roomName).emit('initGame');
+            rooms[roomIndex].hasBegun = true;
+            decks[roomIndex].shuffle();
+            io.in(rooms[roomIndex].roomName).emit('initGame');
         }
     });
     //Update client status to not ready
     socket.on('clientNotReady', function() {
         clients[socket.id].isReady = false;
     });
+    //Todo: refactor so this does not take an object, but a literal
     socket.on('getOtherPlayers', function(roomIndex) {
         socket.emit('otherPlayersInfo',rooms[roomIndex.roomIndex].roomClients);
     });
 
+    //Deal the initial 9 cards to each player
     socket.on('getInitialCards', function() {
-        console.log('in reqCard');
         var cards = [];
+        var roomIndex = clientRoom(socket.id);
         for(var i = 0; i < 9; i++) {
+            //TODO: Do not allow Plot Twist cards to be dealed
             cards.push(decks[clients[socket.id].inRoom].deck[0]);
-            decks[clients[socket.id].inRoom].deck.splice(0,1);
+            decks[roomIndex].deck.splice(0,1);
         }
         socket.emit('cardsGot', cards);
     });
@@ -119,8 +127,7 @@ io.on('connection', function(socket){
     /*After all players have chosen initial cards, let the youngest player
     know that they can go first*/
     socket.on('initDone', function() {
-        console.log('in initDOne');
-        var roomIndex = clients[socket.id].inRoom;
+        var roomIndex = clientRoom(socket.id);
         rooms[roomIndex].initCompleted++;
         console.log(rooms[roomIndex].roomSize + ' ' + rooms[roomIndex].initCompleted);
         if(rooms[roomIndex].initCompleted === rooms[roomIndex].roomSize) {
@@ -131,6 +138,8 @@ io.on('connection', function(socket){
             var cardData = {deckCard:decks[roomIndex].deck[0],
                 thinkTank: decks[roomIndex].thinkTank,
                 discardCard:decks[roomIndex].discardPileTop()};
+            //Tell the youngest player to begin their turn
+            //Two ways depending on if the last socket is the youngest or not
             if(youngestPlayer.socketID === socket.id) {
                 socket.emit('beginTurn',cardData);
             }
@@ -147,7 +156,7 @@ io.on('connection', function(socket){
         socket.emit('beginTurn',cardData);
     });
     socket.on('thinkTankUpdate', function(updatedThinkTank) {
-        var roomIndex = clients[socket.id].inRoom;
+        var roomIndex = clientRoom(socket.id);
         decks[roomIndex].thinkTank = updatedThinkTank;
         console.log(decks[roomIndex].thinkTank);
     });
@@ -194,6 +203,7 @@ io.on('connection', function(socket){
         }
   });
 });
+
 
 //Listen for the correct port
 http.listen(3000,function() {
