@@ -140,6 +140,7 @@ io.on('connection', function(socket){
         }
     });
     socket.on('requestTableCards', function() {
+        var roomIndex = clients[socket.id].inRoom;
         var cardData = {deckCard:decks[roomIndex].deck[0],
             thinkTank: decks[roomIndex].thinkTank,
             discardCard:decks[roomIndex].discardPileTop()};
@@ -154,6 +155,11 @@ io.on('connection', function(socket){
     socket.on('deckCardTaken', function() {
        console.log(decks[clients[socket.id].inRoom].deck);
        decks[clients[socket.id].inRoom].deck.splice(0,1);
+    });
+    socket.on('toDiscardPile', function(card) {
+        var roomIndex = clients[socket.id].inRoom;
+        decks[roomIndex].discardPile.push(card);
+        console.log(decks[roomIndex].discardPile);
     });
     socket.on('discardCardTaken', function() {
         var roomIndex = clients[socket.id].inRoom;
