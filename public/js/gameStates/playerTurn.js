@@ -9,7 +9,8 @@ var playerTurn = {
         playerTurn.handGroup.scale.setTo(0.3);
         playerTurn.handGroup.inputEnableChildren = true;
         for(var i = 0; i < playerTurn.game.playerHand.length; i++) {
-            var cardSprite = playerTurn.game.add.sprite((i * 700) + 70 , 1150, playerTurn.game.playerHand[i].cardName);
+            var cardSprite = playerTurn.game.add.sprite((i * 700) + 70 , 1150,
+                playerTurn.game.playerHand[i].cardName);
             if(playerTurn.game.playerHand[i].cardType === 'Story') {
                 cardSprite.events.onInputDown.add(playerTurn.selectHandCardToSwap,this);
             }
@@ -21,7 +22,8 @@ var playerTurn = {
         this.game.storyGroup.inputEnableChildren = true;
         this.game.storyGroup.onChildInputDown.add(playerTurn.selectStoryCardToSwap,this);
         for(var i = 0; i < playerTurn.game.playerStory.length; i++) {
-            playerTurn.game.storyGroup.add(playerTurn.game.add.sprite((i * 700) + 100 , 100, playerTurn.game.playerStory[i].cardName));
+            playerTurn.game.storyGroup.add(playerTurn.game.add.sprite((i * 700) + 100 , 100,
+                playerTurn.game.playerStory[i].cardName));
         }
     },
     update: function() {
