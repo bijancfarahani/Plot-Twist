@@ -103,7 +103,7 @@ var playerDraw = {
 
     },
     //add the deck card to the player hand and let the server know
-    deckSelect: function(sprite) {
+    deckSelect: function() {
         playerDraw.game.playerHand.push(playerDraw.deckCard);
         playerDraw.game.socket.emit('deckCardTaken');
         playerDraw.changeState();
@@ -116,7 +116,7 @@ var playerDraw = {
     },
     //change the state to the rest of the player turn
     changeState: function() {
-        //Test: do these input handlers need to be turned off?
+        //TODO: do these input handlers need to be here at all?
         playerDraw.deckCard.inputEnabled = false;
         playerDraw.thinkGroup.ignoreChildInput = false;
         if(playerDraw.discardCard)

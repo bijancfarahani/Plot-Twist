@@ -99,11 +99,23 @@ function declareRidingHoodCards () {
     deck.push(new Card('Story','woods_act1','Riding Hood', 1));
     deck.push(new Card('Story','woods_act2','Riding Hood', 2));
 }
-//Only code that is run when a new deck is made
-declareAliceCards();
-declareCinderellaCards();
-declarePeterPanCards();
-declareRidingHoodCards();
+function declareEventCards() {
+    deck.push(new Card('Event','shadow_man'));
+    deck.push(new Card('Event','writers_block'));
+    deck.push(new Card('Event','plagiarism'));
+    deck.push(new Card('Event','inspiration'));
+    deck.push(new Card('Event','magic_pen'));
+
+}
+function declareDeck () {
+    declareAliceCards();
+    declareCinderellaCards();
+    declarePeterPanCards();
+    declareRidingHoodCards();
+    declareEventCards();
+}
+//this is what is run when a new deck is made
+declareDeck();
 
 module.exports.deck = deck;
 module.exports.thinkTank = thinkTank;
@@ -132,8 +144,5 @@ module.exports.resetDeck = function() {
     deck.length = 0;
     thinkTank.length = 0;
     discardPile.length = 0;
-    declareAliceCards();
-    declareCinderellaCards();
-    declarePeterPanCards();
-    declareRidingHoodCards();
+    declareDeck();
 };

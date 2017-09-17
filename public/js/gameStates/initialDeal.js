@@ -13,8 +13,10 @@ var initialDeal = {
                 var card = game.add.sprite((i * 300) + 70 , 350, data[0].cardName);
                 card.name = data[0].cardName;
                 card.scale.setTo(0.3);
-                card.inputEnabled = true;
-                card.events.onInputDown.add(initialDeal.selectCard, this);
+                if(data[0].cardType === 'Story') {
+                    card.inputEnabled = true;
+                    card.events.onInputDown.add(initialDeal.selectCard, this);
+                }
                 data.splice(0, 1);
             }
             for (var j = 0; j < 5; j++) {
@@ -23,11 +25,14 @@ var initialDeal = {
                 var card = game.add.sprite((j * 250) + 30, 10, data[0].cardName);
                 card.name = data[0].cardName;
                 card.scale.setTo(0.3);
-                card.inputEnabled = true;
-                card.events.onInputDown.add(initialDeal.selectCard, this);
+                if(data[0].cardType === 'Story') {
+                    card.inputEnabled = true;
+                    card.events.onInputDown.add(initialDeal.selectCard, this);
+                }
                 data.splice(0, 1);
             }
         });
+        //listen for server response for which state to load next
         game.socket.on('postInitialDeal', function(data) {
             game.state.start(data.nextState);
         })

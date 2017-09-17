@@ -14,6 +14,9 @@ var playerTurn = {
             if(playerTurn.game.playerHand[i].cardType === 'Story') {
                 cardSprite.events.onInputDown.add(playerTurn.selectHandCardToSwap,this);
             }
+            if(playerTurn.game.playerHand[i].cardType === 'Event') {
+                cardSprite.events.onInputDown.add(playerTurn.selectEventCard,this);
+            }
             playerTurn.handGroup.add(cardSprite);
         }
         //define and draw the player story cards
@@ -63,6 +66,22 @@ var playerTurn = {
                 playerTurn.game.socket.emit('toDiscardPile',storyCard);
                 break;
             }
+        }
+    },
+    //This is where Event Card functions are stored
+    selectEventCard: function(cardSprite) {
+        console.log(cardSprite.key);
+        switch(cardSprite.key) {
+            case 'shadow_man':
+                break;
+            case 'writers_block':
+                break;
+            case 'plagiarism':
+                break;
+            case 'inspiration':
+                break;
+            case 'magic_pen':
+                break;
         }
     }
 };

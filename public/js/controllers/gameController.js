@@ -21,8 +21,8 @@ var app = angular.module('gameController',[])
         });
         //Add various game states and start with asset loading
         game.state.add('assetLoad',assetLoad);
-        game.state.add('playerWait',playerWait);
         game.state.add('initialDeal',initialDeal);
+        game.state.add('playerWait',playerWait);
         game.state.add('playerDraw', playerDraw);
         game.state.add('playerTurn', playerTurn);
         game.state.start("assetLoad");
