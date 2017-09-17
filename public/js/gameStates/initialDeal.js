@@ -28,8 +28,13 @@ var initialDeal = {
                 data.splice(0, 1);
             }
         });
+        game.socket.on('postInitialDeal', function(data) {
+            game.state.start(data.nextState);
+        })
     },
     selectCard: function(cardSprite) {
+        //stop input after 5 cards selected
+        if(initialDeal.cardsSelected === 5) return;
         initialDeal.cardsSelected++;
         for(var cardIndex = 0; cardIndex < initialDeal.game.playerHand.length; cardIndex++) {
             if (initialDeal.game.playerHand[cardIndex].cardName === cardSprite.key) {
@@ -39,7 +44,7 @@ var initialDeal = {
         }
         cardSprite.destroy();
         if(initialDeal.cardsSelected === 5) {
-            initialDeal.game.state.start('playerDraw');
+            initialDeal.game.socket.emit('initDone');
         }
     }
 };

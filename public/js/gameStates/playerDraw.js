@@ -25,17 +25,15 @@ var playerDraw = {
             playerDraw.handGroup.add(playerDraw.game.add.sprite((i * 700) + 70 , 1150,
                 playerDraw.game.playerHand[i].cardName));
         }
-        //TODO: handle first turn case
-        if(playerDraw.game.firstMove) {
-            playerDraw.game.socket.emit('initDone');
-            playerDraw.game.firstMove = false;
-        }
-        else {
-            playerDraw.game.socket.emit('requestTableCards');
-        }
+        playerDraw.game.socket.emit('requestTableCards');
     },
     update: function() {
-        //TODO: refactor once first turn case is resolved
+        //This function can only be called after the initialDeal state
+        playerDraw.game.socket.on('beginPlayerWait', function() {
+            playerDraw.game.state.start('playerWait');
+        });
+
+        //This function always gives player the ability to begin their turn
         playerDraw.game.socket.on('beginTurn', function(data) {
             //Set properties of the deck card, both the sprite and card object
             var deckCardSprite = (playerDraw.game.add.sprite(600,30,'cardBack'));

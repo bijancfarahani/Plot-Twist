@@ -30,7 +30,6 @@ function Room(roomName,roomIndex) {
     this.roomSize = 0;
     this.roomClients = [];
     this.hasBegun = false;
-    this.initCompleted = 0;
     //Function to find the youngest player in the room
     this.youngestPlayer = function() {
         var youngest = this.roomClients[0];
@@ -125,27 +124,20 @@ io.on('connection', function(socket){
     });
 
     /*After all players have chosen initial cards, let the youngest player
-    know that they can go first*/
+    know that they can go first, others go to waiting state*/
     socket.on('initDone', function() {
         var roomIndex = clientRoom(socket.id);
-        rooms[roomIndex].initCompleted++;
-        console.log(rooms[roomIndex].roomSize + ' ' + rooms[roomIndex].initCompleted);
-        if(rooms[roomIndex].initCompleted === rooms[roomIndex].roomSize) {
+        //Check if all clients have chosen their cards
+        var youngestPlayer = rooms[roomIndex].youngestPlayer();
+        if(youngestPlayer.socketID === socket.id) {
             decks[roomIndex].setThinkTank();
-            var youngestPlayer = rooms[roomIndex].youngestPlayer();
-            console.log(youngestPlayer.socketID);
-            console.log(socket.id);
             var cardData = {deckCard:decks[roomIndex].deck[0],
-                thinkTank: decks[roomIndex].thinkTank,
-                discardCard:decks[roomIndex].discardPileTop()};
-            //Tell the youngest player to begin their turn
-            //Two ways depending on if the last socket is the youngest or not
-            if(youngestPlayer.socketID === socket.id) {
-                socket.emit('beginTurn',cardData);
-            }
-            else {
-                socket.broadcast.to(youngestPlayer.socketID).emit('beginTurn',cardData);
-            }
+                thinkTank: decks[roomIndex].thinkTank};
+            socket.emit('postInitialDeal',{nextState: 'playerDraw'});
+        }
+        else {
+            console.log('postInitial Emitted');
+            socket.emit('postInitialDeal',{nextState: 'playerWait'});
         }
     });
     socket.on('requestTableCards', function() {
@@ -193,13 +185,11 @@ io.on('connection', function(socket){
                 if (rooms[roomIndex].roomSize === 0) {
                     rooms[roomIndex].roomClients = [];
                     rooms[roomIndex].hasBegun = false;
-                    rooms[roomIndex].initCompleted = 0;
                     decks[roomIndex].resetDeck();
                 }
             }
             //remove the socket from the global list
             delete clients[socket.id];
-            //TODO: check if internal rooms automatically clear out on disconnect
         }
   });
 });

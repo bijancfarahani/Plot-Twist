@@ -58,6 +58,7 @@ var playerTurn = {
                 storyCard = playerTurn.game.playerStory[i];
                 playerTurn.game.playerStory[i] = handCard;
                 playerTurn.handGroup.removeChildAt(handCardIndex);
+                //TODO:Write and call function to redraw hand
                 console.log(playerTurn.handGroup);
                 playerTurn.game.socket.emit('toDiscardPile',storyCard);
                 break;
