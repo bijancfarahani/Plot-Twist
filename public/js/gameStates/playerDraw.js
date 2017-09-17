@@ -20,6 +20,7 @@ var playerDraw = {
         playerDraw.handGroup.onChildInputDown.add(playerDraw.SwapThinkWithHand,this);
         playerDraw.handGroup.scale.setTo(0.3);
         //position player cards on the screen
+        console.log(playerDraw.game.playerHand);
         for(var i = 0; i < playerDraw.game.playerHand.length; i++) {
             playerDraw.handGroup.add(playerDraw.game.add.sprite((i * 700) + 70 , 1150,
                 playerDraw.game.playerHand[i].cardName));
