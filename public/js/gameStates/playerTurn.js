@@ -71,6 +71,7 @@ var playerTurn = {
     //This is where Event Card functions are stored
     selectEventCard: function(cardSprite) {
         console.log(cardSprite.key);
+        console.log(playerTurn.game.otherPlayers);
         switch(cardSprite.key) {
             case 'shadow_man':
                 break;

@@ -107,8 +107,10 @@ io.on('connection', function(socket){
         clients[socket.id].isReady = false;
     });
     //Todo: refactor so this does not take an object, but a literal
-    socket.on('getOtherPlayers', function(roomIndex) {
-        socket.emit('otherPlayersInfo',rooms[roomIndex.roomIndex].roomClients);
+    socket.on('getOtherPlayers', function() {
+        var roomIndex = clientRoom(socket.id);
+        console.log();
+        socket.emit('otherPlayersInfo',{clients: rooms[roomIndex].roomClients});
     });
 
     //Deal the initial 9 cards to each player
@@ -116,7 +118,7 @@ io.on('connection', function(socket){
         var cards = [];
         var roomIndex = clientRoom(socket.id);
         for(var i = 0; i < 9; i++) {
-            //TODO: Do not allow Plot Twist cards to be dealed
+            //TODO: Do not allow Plot Twist cards to be dealt
             cards.push(decks[clients[socket.id].inRoom].deck[0]);
             decks[roomIndex].deck.splice(0,1);
         }
