@@ -25,13 +25,9 @@ var playerDraw = {
                 playerDraw.game.playerHand[i].cardName));
         }
         playerDraw.game.socket.emit('requestTableCards');
+
     },
     update: function() {
-        //This function can only be called after the initialDeal state
-        playerDraw.game.socket.on('beginPlayerWait', function() {
-            playerDraw.game.state.start('playerWait');
-        });
-
         //This function always gives player the ability to begin their turn
         playerDraw.game.socket.on('beginTurn', function(data) {
             //Set properties of the deck card, both the sprite and card object
@@ -51,12 +47,16 @@ var playerDraw = {
                 discardCardSprite.cardName = data.discardCard.cardName;
             }
             //Set properties for the think tank cards
-            for(var i = 0; i < data.thinkTank.length; i ++) {
+            for(var i = 0; i < data.thinkTank.length; i++) {
                 var thinkCard = playerDraw.game.add.sprite((700 * i) + 150, 100,data.thinkTank[i].cardName);
                 playerDraw.game.thinkTank.push(new Card(data.thinkTank[i]));
                 thinkCard.cardName = data.thinkTank[i].cardName;
                 thinkCard.thinkTankPosition = i;
                 playerDraw.thinkGroup.add(thinkCard);
+            }
+            //Set other player's stories data
+           for(var i = 0; i < data.playerStorys.length; i++) {
+                playerDraw.game.otherPlayers[i].story = data.playerStorys[i];
             }
 
         });

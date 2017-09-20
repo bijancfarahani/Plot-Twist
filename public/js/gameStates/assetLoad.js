@@ -103,6 +103,9 @@ var assetLoad = {
 
         //Load back of cards
         this.game.load.image('cardBack', '../../assets/cards/cardBack.png');
+
+        //Load UI elements
+        this.game.load.image('button', '../../assets/ui/button.png');
     },
     create: function() {
         this.game.state.start('initialDeal');

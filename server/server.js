@@ -19,6 +19,7 @@ function Client(clientInfo, socketID) {
     }
     this.playerNo = null;
     this.socketID = socketID;
+    this.playerStory = null;
 }
 //global list of all currently connected clients
 var clients = [];
@@ -109,7 +110,6 @@ io.on('connection', function(socket){
     //Todo: refactor so this does not take an object, but a literal
     socket.on('getOtherPlayers', function() {
         var roomIndex = clientRoom(socket.id);
-        console.log();
         socket.emit('otherPlayersInfo',{clients: rooms[roomIndex].roomClients});
     });
 
@@ -133,36 +133,44 @@ io.on('connection', function(socket){
         var youngestPlayer = rooms[roomIndex].youngestPlayer();
         if(youngestPlayer.socketID === socket.id) {
             decks[roomIndex].setThinkTank();
-            var cardData = {deckCard:decks[roomIndex].deck[0],
-                thinkTank: decks[roomIndex].thinkTank};
             socket.emit('postInitialDeal',{nextState: 'playerDraw'});
         }
         else {
-            console.log('postInitial Emitted');
             socket.emit('postInitialDeal',{nextState: 'playerWait'});
         }
     });
+    //TODO:Test this
+    socket.on('sendStoryCards',function(data) {
+        clients[socket.id].playerStory = data;
+        console.log('logging Story Cards for '+ clients[socket.id].userName);
+        console.log(clients[socket.id].playerStory);
+    });
     socket.on('requestTableCards', function() {
         var roomIndex = clients[socket.id].inRoom;
+        var playerStorys = [];
+        for(var i = 0; i < rooms[roomIndex].roomClients.length; i++) {
+            if(rooms[roomIndex].roomClients[i].socketID !== socket.id) {
+                playerStorys.push(rooms[roomIndex].roomClients[i].playerStory);
+            }
+        }
+        //TODO: just send all client info with the story
         var cardData = {deckCard:decks[roomIndex].deck[0],
             thinkTank: decks[roomIndex].thinkTank,
-            discardCard:decks[roomIndex].discardPileTop()};
+            discardCard:decks[roomIndex].discardPileTop(),
+            playerStorys: playerStorys};
         socket.emit('beginTurn',cardData);
     });
     socket.on('thinkTankUpdate', function(updatedThinkTank) {
         var roomIndex = clientRoom(socket.id);
         decks[roomIndex].thinkTank = updatedThinkTank;
-        console.log(decks[roomIndex].thinkTank);
     });
     //Client removes the top card from the deck
     socket.on('deckCardTaken', function() {
-       console.log(decks[clients[socket.id].inRoom].deck);
        decks[clients[socket.id].inRoom].deck.splice(0,1);
     });
     socket.on('toDiscardPile', function(card) {
         var roomIndex = clients[socket.id].inRoom;
         decks[roomIndex].discardPile.push(card);
-        console.log(decks[roomIndex].discardPile);
     });
     socket.on('discardCardTaken', function() {
         var roomIndex = clients[socket.id].inRoom;

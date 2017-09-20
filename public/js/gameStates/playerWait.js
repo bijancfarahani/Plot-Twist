@@ -1,4 +1,5 @@
 var playerWait = {
+    game: null,
     create: function() {
         playerWait.game = this.game;
         //define and draw the player hand cards
@@ -15,8 +16,8 @@ var playerWait = {
             playerWait.storyGroup.add(playerWait.game.add.sprite((i * 700) + 100 , 100,
                 playerWait.game.playerStory[i].cardName));
         }
+        this.game.socket.emit('sendStoryCards',this.game.playerStory);
     },
     update: function() {
-
     }
 };

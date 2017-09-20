@@ -6,6 +6,7 @@ function Card(cardType,name,story,act) {
     this.cardName = name;
     this.cardStory = story;
     this.cardAct = act;
+    this.turnsBlocked = 0;
 }
 
 function declareAliceCards() {

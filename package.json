@@ -4,7 +4,10 @@
   "description": "multiplayer nodejs server",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "webdriver": "webdriver-manager start",
+    "node": "node server/server.js",
+    "nodemon": "nodemon server/server.js",
+    "protractor": "protractor tests/conf.js"
   },
   "author": "Bijan Farahani",
   "license": "ISC",

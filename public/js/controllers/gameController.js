@@ -16,15 +16,21 @@ var app = angular.module('gameController',[])
         game.state.add('playerTurn', playerTurn);
         //get other players info
         socket.emit('getOtherPlayers');
-        socket.on('otherPlayersInfo',function(roomClients) {
-            for(var i = 0; i < roomClients.length; i++) {
-                if(roomClients[i].userName === window.sessionStorage.getItem('userName')) {
-                    roomClients.splice(i,1);
-                    game.otherPlayers = roomClients;
+        socket.on('otherPlayersInfo',function(data) {
+            console.log(data);
+            for(var i = 0; i < data.clients.length; i++) {
+                console.log('in loop ' + i);
+                if(data.clients[i].userName === window.sessionStorage.getItem('userName')) {
+                    data.clients.splice(i,1);
+
+                    game.otherPlayers = data.clients;
+                    console.log(game.otherPlayers);
                     //begin the game
-                    game.state.start("assetLoad");
+                    game.state.start('assetLoad');
+
                 }
             }
+            //game.state.start("assetLoad"); //Is it ok for this to be outside the loop (async??)
         });
 
     });

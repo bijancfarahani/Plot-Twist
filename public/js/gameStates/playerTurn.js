@@ -2,31 +2,45 @@ var playerTurn = {
     game: null,
     handGroup: null,
     selectedHandStoryCard: null,
+    buttonGroup: null,
+    otherPlayerSelected: null,
     create: function() {
         playerTurn.game = this.game;
+        var game = this.game;
         //define and draw the player hand cards
-        playerTurn.handGroup = this.game.add.group();
+        playerTurn.handGroup = game.add.group();
         playerTurn.handGroup.scale.setTo(0.3);
         playerTurn.handGroup.inputEnableChildren = true;
-        for(var i = 0; i < playerTurn.game.playerHand.length; i++) {
-            var cardSprite = playerTurn.game.add.sprite((i * 700) + 70 , 1150,
-                playerTurn.game.playerHand[i].cardName);
-            if(playerTurn.game.playerHand[i].cardType === 'Story') {
+        for(var i = 0; i < game.playerHand.length; i++) {
+            var cardSprite = game.add.sprite((i * 700) + 70 , 1150,
+                game.playerHand[i].cardName);
+            if(game.playerHand[i].cardType === 'Story') {
                 cardSprite.events.onInputDown.add(playerTurn.selectHandCardToSwap,this);
             }
-            if(playerTurn.game.playerHand[i].cardType === 'Event') {
+            if(game.playerHand[i].cardType === 'Event') {
                 cardSprite.events.onInputDown.add(playerTurn.selectEventCard,this);
             }
             playerTurn.handGroup.add(cardSprite);
         }
         //define and draw the player story cards
-        this.game.storyGroup = this.game.add.group();
-        this.game.storyGroup.scale.setTo(0.25);
-        this.game.storyGroup.inputEnableChildren = true;
-        this.game.storyGroup.onChildInputDown.add(playerTurn.selectStoryCardToSwap,this);
-        for(var i = 0; i < playerTurn.game.playerStory.length; i++) {
-            playerTurn.game.storyGroup.add(playerTurn.game.add.sprite((i * 700) + 100 , 100,
-                playerTurn.game.playerStory[i].cardName));
+        game.storyGroup = this.game.add.group();
+        game.storyGroup.scale.setTo(0.25);
+        game.storyGroup.inputEnableChildren = true;
+        game.storyGroup.onChildInputDown.add(playerTurn.selectStoryCardToSwap,this);
+        for(var i = 0; i < game.playerStory.length; i++) {
+            game.storyGroup.add(game.add.sprite((i * 700) + 100 , 100, game.playerStory[i].cardName));
+        }
+        playerTurn.buttonGroup = this.game.add.group();
+
+        for(var i = 0; i < game.otherPlayers.length; i++) {
+            var button = game.make.button(game.world.centerX + (i * 100), 300, 'button',playerTurn.buttonClick);
+            button.userName = game.otherPlayers.userName;
+            var textStyle = {font: '14px Arial', fill: "#ffb675", align: 'center'};
+            var playerText = game.add.text(game.world.centerX + (i * 100),300, game.otherPlayers[i].userName,textStyle);
+
+            playerTurn.buttonGroup.add(button);
+            playerTurn.buttonGroup.add(playerText);
+            playerTurn.buttonGroup.visible = true;
         }
     },
     update: function() {
@@ -74,6 +88,8 @@ var playerTurn = {
         console.log(playerTurn.game.otherPlayers);
         switch(cardSprite.key) {
             case 'shadow_man':
+                playerTurn.buttonGroup.visible = true;
+
                 break;
             case 'writers_block':
                 break;
@@ -84,5 +100,8 @@ var playerTurn = {
             case 'magic_pen':
                 break;
         }
+    },
+    buttonClick: function(button) {
+        playerTurn.otherPlayerSelected = button.userName;
     }
 };
