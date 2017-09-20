@@ -7,7 +7,10 @@ describe('runFourUsers', function() {
 	var forks = [];
 	//declare and store client windows
 	for(var i = 0; i < numTabs; i++) {
-		forks.push(browser.forkNewDriverInstance(true))
+		if(i === 0)
+			forks.push(browser);
+		else
+			forks.push(browser.forkNewDriverInstance(true));
 	}
 	//automates the client input page
 	it('clientInfo', function() {
@@ -33,7 +36,7 @@ describe('runFourUsers', function() {
 			var joinButton = forks[i].element.all(by.className('joinButton')).get(0);
 
 			//let the page load the button before attempting to press it
-			forks[i].wait(until.presenceOf(joinButton),5000,'joinButton not here');
+			forks[i].wait(until.presenceOf(joinButton),5000,'joinButton not found');
 			joinButton.click();
 		}
 	});
