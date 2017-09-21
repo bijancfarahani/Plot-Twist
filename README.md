@@ -9,3 +9,5 @@ To run it locally, download/clone this repository and run:
 npm install
 as well as
 bower install
+
+If anyone wants to help me with this, hmu
